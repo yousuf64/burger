@@ -1,0 +1,55 @@
+syntax = "proto3";
+package products;
+option go_package = "github.com/yousuf64/burger/products";
+
+service Products {
+  rpc CreateProduct(CreateProductRequest) returns (CreateProductResponse) {}
+  rpc GetProduct(GetProductRequest) returns (GetProductResponse) {}
+  rpc GetProducts(GetProductsRequest) returns (GetProductsResponse) {}
+}
+
+message CreateProductRequest {
+  string name = 1;
+  string sku = 2;
+  string description = 3;
+  float price = 4;
+  string thumbnail = 5;
+  bool available = 6;
+  bool featured = 7;
+  repeated string images = 8;
+  int64 category_id = 9;
+  int64 created_at = 10;
+  int64 updated_at = 11;
+  int64 deleted_at = 12;
+}
+
+message CreateProductResponse {
+  int64 product_id = 1;
+}
+
+message GetProductRequest {
+  int64 product_id = 1;
+}
+
+message GetProductResponse {
+  string name = 2;
+  string sku = 3;
+  string description = 4;
+  float price = 5;
+  string thumbnail = 6;
+  bool available = 7;
+  bool featured = 8;
+  repeated string images = 9;
+  int64 category_id = 10;
+  int64 created_at = 11;
+  int64 updated_at = 12;
+  int64 deleted_at = 13;
+}
+
+message GetProductsRequest {
+  int64 user_id = 1;
+}
+
+message GetProductsResponse {
+  repeated GetProductsResponse products = 1;
+}

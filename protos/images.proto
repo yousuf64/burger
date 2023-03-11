@@ -1,0 +1,17 @@
+syntax = "proto3";
+package images;
+option go_package = "github.com/yousuf64/burger/images";
+
+service Images {
+  rpc UploadImage(UploadImageRequest) returns (UploadImageResponse) {}
+}
+
+message UploadImageRequest {
+  string name = 1;
+  string type = 2;
+  bytes data = 3;
+}
+
+message UploadImageResponse {
+  string url = 1;
+}
