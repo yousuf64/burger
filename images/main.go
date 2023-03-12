@@ -7,27 +7,31 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"os"
+	"os/signal"
 )
 
-type imagesServer struct {
-	images.UnimplementedImagesServer
-}
-
-func (imagesServer) UploadImage(context.Context, *images.UploadImageRequest) (*images.UploadImageResponse, error) {
-	return &images.UploadImageResponse{
-		Url: "image-server/foo.jpg",
-	}, nil
-}
+var addr = "localhost:3001"
 
 func main() {
-	lis, err := net.Listen("tcp", "localhost:3001")
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer stop()
+
+	azBlobClient := NewAzBlobClient()
+	SeedContainers(ctx, azBlobClient)
+	imgSvr := imagesServer{azBlob: azBlobClient}
+
+	lis, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("listening on localhost:3001")
+	fmt.Printf("listening on %s\n", addr)
 
 	var opts []grpc.ServerOption
-	server := grpc.NewServer(opts...)
-	images.RegisterImagesServer(server, imagesServer{})
-	server.Serve(lis)
+	grpcSvr := grpc.NewServer(opts...)
+	images.RegisterImagesServer(grpcSvr, imgSvr)
+	err = grpcSvr.Serve(lis)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
